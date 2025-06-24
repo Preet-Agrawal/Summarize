@@ -24,7 +24,7 @@ def generate_openai_response(prompt):
                 "content": prompt,
             }
         ],
-        model="openai/gpt-4o-mini",  # or "openai/gpt-4o", "openai/gpt-4.1", etc.
+        model="openai/gpt-4o-mini", 
         temperature=1,
         max_tokens=4096,
         top_p=1
