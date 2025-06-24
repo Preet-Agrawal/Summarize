@@ -1,19 +1,38 @@
+import os
 from flask import Flask, render_template, request
 from flask_cors import CORS
-import google.generativeai as genai
+from openai import OpenAI
 
 app = Flask(__name__)
 CORS(app)
 
-genai.configure(api_key="AIzaSyBYwi1oCcneIDSfUEBQa_sqTatLYd1iXVg") 
-def generate_gemini_response(prompt):
-    model = genai.GenerativeModel("models/gemini-1.5-pro-latest")
-    response = model.generate_content(prompt)
-    return response.text
+# Authenticate with the GitHub Copilot Models API
+client = OpenAI(
+    base_url="https://models.github.ai/inference",
+    api_key=os.environ["GITHUB_TOKEN"],
+)
+
+def generate_openai_response(prompt):
+    response = client.chat.completions.create(
+        messages=[
+            {
+                "role": "system",
+                "content": "You are a helpful assistant.",
+            },
+            {
+                "role": "user",
+                "content": prompt,
+            }
+        ],
+        model="openai/gpt-4o-mini",  # or "openai/gpt-4o", "openai/gpt-4.1", etc.
+        temperature=1,
+        max_tokens=4096,
+        top_p=1
+    )
+    return response.choices[0].message.content
 
 @app.route("/")
 def hello_world():
-    print("Root route accessed")
     return render_template('index.html')
 
 @app.route("/generate", methods=["POST"])
@@ -30,11 +49,10 @@ Story:
 {user_text}
 """
     try:
-        result = generate_gemini_response(prompt)
+        result = generate_openai_response(prompt)
         return result
     except Exception as e:
         return f"Error: {str(e)}", 500
 
 if __name__ == "__main__":
-    print("Starting Flask server...")
     app.run(debug=True, port=7000)
