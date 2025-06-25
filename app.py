@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 from flask_cors import CORS
 from openai import OpenAI
 
@@ -17,7 +17,7 @@ def generate_openai_response(prompt):
         messages=[
             {
                 "role": "system",
-                "content": "You are a helpful assistant.",
+                "content": "You are a helpful assistant that creates structured summaries and quizzes.",
             },
             {
                 "role": "user",
@@ -41,18 +41,57 @@ def generate():
     user_text = data.get("text", "")
 
     if not user_text:
-        return "No input received.", 400
+        return jsonify({"error": "No input received."}), 400
 
-    prompt = f"""Summarize the following story and generate 3 multiple choice questions with 4 options each. Mark the correct answer with (✔️).
+    prompt = f"""Summarize the following story and generate 5 multiple choice questions with 4 options each. Format your response as follows:
+
+SUMMARY:
+[Write a concise summary of the story]
+
+QUIZ:
+1. [Question 1]
+   A) [Option A]
+   B) [Option B] 
+   C) [Option C]
+   D) [Option D]
+   Correct: [A/B/C/D]
+
+2. [Question 2]
+   A) [Option A]
+   B) [Option B]
+   C) [Option C]
+   D) [Option D]
+   Correct: [A/B/C/D]
+
+3. [Question 3]
+   A) [Option A]
+   B) [Option B]
+   C) [Option C]
+   D) [Option D]
+   Correct: [A/B/C/D]
+
+4. [Question 4]
+   A) [Option A]
+   B) [Option B]
+   C) [Option C]
+   D) [Option D]
+   Correct: [A/B/C/D]
+
+5. [Question 5]
+   A) [Option A]
+   B) [Option B]
+   C) [Option C]
+   D) [Option D]
+   Correct: [A/B/C/D]
 
 Story:
 {user_text}
 """
     try:
         result = generate_openai_response(prompt)
-        return result
+        return jsonify({"result": result})
     except Exception as e:
-        return f"Error: {str(e)}", 500
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
     app.run(debug=True, port=7000)

@@ -7,6 +7,10 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+  <div class="floating-shape shape1"></div>
+  <div class="floating-shape shape2"></div>
+  <div class="floating-shape shape3"></div>
+  <div class="floating-shape shape4"></div>
 
   <!-- Header -->
   <header class="header">
@@ -49,35 +53,44 @@
       <div class="text-area-container">
         <textarea id="storyInput" placeholder="Paste your story here..."></textarea>
       </div>
-      <button class="get-started" onclick="submitStory()">Summarize</button>
+      <button class="get-started" onclick="submitStory()">Summarize & Quiz</button>
     </div>
 
-    <div class="result-section">
-      <h2>Result</h2>
-      <pre id="resultBox">Your summary and quiz will appear here...</pre>
+    <!-- Loading Section -->
+    <div id="loadingSection" class="loading-section" style="display: none;">
+      <div class="loading-spinner"></div>
+      <p>Generating your summary and quiz...</p>
     </div>
 
-    <script>
-      async function submitStory() {
-  const inputText = document.getElementById("storyInput").value.trim();
-  const resultBox = document.getElementById("resultBox");
-  resultBox.textContent = "⏳ Processing...";
+    <!-- Result Section -->
+    <div id="resultSection" class="result-section" style="display: none;">
+      <!-- Summary Section -->
+      <div class="summary-container">
+        <h2 class="section-title">📖 Story Summary</h2>
+        <div id="summaryContent" class="summary-content"></div>
+      </div>
 
-  const response = await fetch("/generate", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ text: inputText }),
-  });
+      <!-- Quiz Section -->
+      <div class="quiz-container">
+        <div class="quiz-header">
+          <h2 class="section-title">🧠 Quiz Time!</h2>
+          <div class="score-display">
+            <span id="scoreText">Score: 0/5</span>
+            <button id="resetQuiz" class="reset-btn" onclick="resetQuiz()">Reset Quiz</button>
+          </div>
+        </div>
+        <div id="quizContent" class="quiz-content"></div>
+        <div id="quizResults" class="quiz-results" style="display: none;">
+          <h3>🎉 Quiz Complete!</h3>
+          <p id="finalScore"></p>
+          <p id="performanceMessage"></p>
+        </div>
+      </div>
+    </div>
 
-  const resultText = await response.text();
-  if (!response.ok) {
-    resultBox.textContent = "❌ Error: " + resultText;
-    return;
-  }
-
-  resultBox.textContent = resultText;
-}
-    </script>
+    <!-- External JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
   </main>
 </body>
 </html>
