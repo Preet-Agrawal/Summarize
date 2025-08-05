@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+      .auth-card {
+        max-width: 370px;
+        margin: 4rem auto 0 auto;
+        background: rgba(255,255,255,0.97);
+        border-radius: 16px;
+        box-shadow: 0 4px 24px rgba(80, 80, 160, 0.13);
+        padding: 2.2rem 2rem 1.5rem 2rem;
+        position: relative;
+        z-index: 3;
+      }
+      .auth-card h2 {
+        text-align: center;
+        color: #6c63ff;
+        margin-bottom: 1.5rem;
+        font-weight: 800;
+        letter-spacing: 1px;
+      }
+      .auth-form-group {
+        margin-bottom: 1.2rem;
+      }
+      .auth-form-group label {
+        font-weight: 600;
+        color: #3a3a8a;
+        margin-bottom: 0.3rem;
+        display: block;
+      }
+      .auth-form-group input {
+        width: 100%;
+        padding: 0.7rem 1rem;
+        border-radius: 7px;
+        border: 1.2px solid #b993d6;
+        font-size: 1rem;
+        background: #f7f7ff;
+        margin-top: 0.2rem;
+        transition: border 0.2s;
+      }
+      .auth-form-group input:focus {
+        border-color: #6c63ff;
+        outline: none;
+      }
+      .auth-btn {
+        width: 100%;
+        padding: 0.9rem 0;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #fff;
+        background: linear-gradient(90deg, #b993d6 0%, #6c63ff 100%);
+        border: none;
+        border-radius: 7px;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        margin-top: 0.5em;
+        transition: background 0.2s, transform 0.2s;
+      }
+      .auth-btn:hover {
+        background: linear-gradient(90deg, #6c63ff 0%, #b993d6 100%);
+        transform: translateY(-2px) scale(1.03);
+      }
+      .auth-messages {
+        margin-top: 1.2rem;
+        text-align: center;
+      }
+      .auth-messages li {
+        list-style: none;
+        color: #b71c1c;
+        font-weight: 600;
+        margin-bottom: 0.5em;
+      }
+      .auth-input {
+  width: 100%;
+  padding: 0.7rem 1rem;
+  border-radius: 7px;
+  border: 1.2px solid #b993d6;
+  font-size: 1rem;
+  background: #f7f7ff;
+  margin-top: 0.2rem;
+  transition: border 0.2s;
+  box-sizing: border-box;
+}
+.auth-input:focus {
+  border-color: #6c63ff;
+  outline: none;
+}
+    </style>
+</head>
+<body>
+    <div class="auth-card">
+        <h2>Register</h2>
+        <form method="POST">
+            {{ form.hidden_tag() }}
+            <div class="auth-form-group">
+                {{ form.username.label }}
+                {{ form.username(class_="auth-input") }}
+            </div>
+            <div class="auth-form-group">
+                {{ form.password.label }}
+                {{ form.password(class_="auth-input") }}
+            </div>
+            <div class="auth-form-group">
+                {{ form.confirm.label }}
+                {{ form.confirm(class_="auth-input") }}
+            </div>
+            <div>
+                {{ form.submit(class_="auth-btn") }}
+            </div>
+        </form>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <ul class="auth-messages">
+            {% for category, message in messages %}
+              <li class="{{ category }}">{{ message }}</li>
+            {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+    </div>
+</body>
+</html>
