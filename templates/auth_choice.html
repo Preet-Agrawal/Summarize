@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Welcome - Login or Register</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="main">
+        <h2>Welcome!</h2>
+        <p>Please choose an option:</p>
+        <a href="{{ url_for('login') }}" class="get-started">Login (Existing User)</a>
+        <a href="{{ url_for('register') }}" class="get-started">Register (New User)</a>
+    </div>
+</body>
+</html>
