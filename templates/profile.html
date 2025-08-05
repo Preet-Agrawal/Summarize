@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="main">
+        <h2>My Profile</h2>
+        <p>Username: {{ user.username }}</p>
+        <h3>Quiz History</h3>
+        {% if quiz_results %}
+            <ul>
+            {% for result in quiz_results %}
+                <li>
+                    <strong>Date:</strong> {{ result.date.strftime('%Y-%m-%d %H:%M') if result.date else 'N/A' }}<br>
+                    <strong>Score:</strong> 
+                    {% if result.score is not none %}
+                        {{ result.score }}/5
+                    {% else %}
+                        N/A (Quiz not completed)
+                    {% endif %}
+                </li>
+            {% endfor %}
+            </ul>
+        {% else %}
+            <p>No quiz history yet.</p>
+        {% endif %}
+        <a href="{{ url_for('hello_world') }}">Back to Home</a>
+    </div>
+</body>
+</html>
