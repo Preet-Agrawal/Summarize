@@ -1,34 +1,499 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Profile</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>My Profile - {{ user.username }}</title>
+    <style>
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* Header Styles - Matching Home Page */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.7rem 1.2rem;
+            background: rgba(255,255,255,0.95);
+            box-shadow: 0 4px 24px rgba(80, 80, 160, 0.08);
+            border-radius: 0 0 12px 12px;
+            position: relative;
+            z-index: 10;
+            margin-bottom: 0.2rem;
+            transition: background 0.3s;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+        }
+
+        .logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(100, 80, 160, 0.08);
+            transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .logo:hover {
+            transform: scale(1.12) rotate(-8deg);
+        }
+
+        .site-title {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: #3a3a8a;
+            letter-spacing: 1.5px;
+            text-shadow: 0 2px 8px rgba(185, 147, 214, 0.08);
+        }
+
+        .header-right, nav.header-right {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 2em;
+        }
+
+        .nav-link {
+            display: inline-block;
+            padding: 0.5em 1em;
+            text-decoration: none;
+            color: #3a3a8a;
+            font-size: 1em;
+            border-radius: 6px;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .nav-link:hover {
+            background: #ececff;
+            color: #6c63ff;
+        }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background: white;
+            min-width: 200px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            z-index: 1;
+            margin-top: 0.5rem;
+        }
+
+        .dropdown-content a {
+            color: #333;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            font-size: 0.9rem;
+        }
+
+        .dropdown-content a:hover {
+            background: #f1f1f1;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        /* Profile Container */
+        .profile-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        /* Profile Header Card */
+        .profile-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 16px;
+            padding: 2.5rem;
+            color: white;
+            margin-bottom: 2rem;
+        }
+
+        .profile-info {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .avatar {
+            width: 100px;
+            height: 100px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .user-details h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .user-meta {
+            opacity: 0.9;
+            font-size: 1rem;
+        }
+
+        /* Stats Section */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Quiz History Section */
+        .history-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .quiz-list {
+            list-style: none;
+        }
+
+        .quiz-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid #667eea;
+        }
+
+        .quiz-date {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .quiz-score {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .score-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            margin-left: 0.5rem;
+            font-weight: 500;
+        }
+
+        .badge-excellent {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-good {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .badge-practice {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #999;
+        }
+
+        .empty-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Action Buttons */
+        .actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: transform 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-secondary:hover {
+            background: #f7f7ff;
+            transform: translateY(-2px);
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                padding: 1rem;
+                gap: 1rem;
+            }
+
+            .header-right {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 1rem;
+            }
+
+            .nav-link {
+                padding: 0.4em 0.8em;
+                font-size: 0.9em;
+            }
+
+            .profile-info {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .avatar {
+                width: 80px;
+                height: 80px;
+                font-size: 2rem;
+            }
+
+            .user-details h1 {
+                font-size: 1.5rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
 </head>
 <body>
-    <div class="main">
-        <h2>My Profile</h2>
-        <p>Username: {{ user.username }}</p>
-        <h3>Quiz History</h3>
-        {% if quiz_results %}
-            <ul>
-            {% for result in quiz_results %}
-                <li>
-                    <strong>Date:</strong> {{ result.date.strftime('%Y-%m-%d %H:%M') if result.date else 'N/A' }}<br>
-                    <strong>Score:</strong> 
-                    {% if result.score is not none %}
-                        {{ result.score }}/5
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <img src="{{ url_for('static', filename='images/logo.jpg') }}" alt="Logo" class="logo" width="40" height="40">
+            <h2 class="site-title">Story Quiz</h2>
+        </div>
+        <nav class="header-right">
+            <a href="{{ url_for('hello_world') }}" class="nav-link">Home</a>
+            <div class="dropdown">
+                <a href="#" class="nav-link">About</a>
+                <div class="dropdown-content">
+                    <a href="#">This is a project made by 3rd Year student of IIIT Surat</a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <a href="#" class="nav-link">Contact Us</a>
+                <div class="dropdown-content">
+                    <a href="#">Preet Kumar, 7004613120</a>
+                    <a href="#">Kalpana Singh, 9555546882</a>
+                </div>
+            </div>
+            {% if 'username' in session %}
+                <a href="{{ url_for('profile') }}" class="nav-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3a3a8a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle; margin-right:5px;">
+                        <circle cx="12" cy="7" r="4"/>
+                        <path d="M5.5 21a8.38 8.38 0 0 1 13 0"/>
+                    </svg>
+                    {{ session['username'] }}
+                </a>
+                <a href="{{ url_for('logout') }}" class="nav-link">Logout</a>
+            {% else %}
+                <a href="{{ url_for('auth_choice') }}" class="nav-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3a3a8a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle; margin-right:5px;">
+                        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+                        <polyline points="10 17 15 12 10 7"/>
+                        <line x1="15" y1="12" x2="3" y2="12"/>
+                    </svg>
+                    Login/Register
+                </a>
+            {% endif %}
+        </nav>
+    </header>
+
+    <!-- Profile Content -->
+    <div class="profile-container">
+        <!-- Profile Header -->
+        <div class="profile-header">
+            <div class="profile-info">
+                <div class="avatar">
+                    {{ user.username[0].upper() }}
+                </div>
+                <div class="user-details">
+                    <h1>{{ user.username }}</h1>
+                    <div class="user-meta">
+                        Member since {{ user.created_at.strftime('%B %Y') if user.created_at else '2024' }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">{{ quiz_results|length if quiz_results else 0 }}</div>
+                <div class="stat-label">Quizzes Taken</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">
+                    {% if quiz_results %}
+                        {% set completed_quizzes = quiz_results|selectattr('score', 'defined')|selectattr('score', 'ne', None)|list %}
+                        {% if completed_quizzes|length > 0 %}
+                            {{ (completed_quizzes|map(attribute='score')|sum / completed_quizzes|length)|round(1) }}
+                        {% else %}
+                            0
+                        {% endif %}
                     {% else %}
-                        N/A (Quiz not completed)
+                        0
                     {% endif %}
-                </li>
-            {% endfor %}
-            </ul>
-        {% else %}
-            <p>No quiz history yet.</p>
-        {% endif %}
-        <a href="{{ url_for('hello_world') }}">Back to Home</a>
+                </div>
+                <div class="stat-label">Average Score</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">
+                    {% if quiz_results %}
+                        {{ quiz_results|selectattr('score', 'defined')|selectattr('score', 'ne', None)|map(attribute='score')|max|default(0) }}
+                    {% else %}
+                        0
+                    {% endif %}
+                </div>
+                <div class="stat-label">Best Score</div>
+            </div>
+        </div>
+
+        <!-- Quiz History -->
+        <div class="history-section">
+            <h2 class="section-title">
+                <span>📊</span> Quiz History
+            </h2>
+            {% if quiz_results %}
+                <ul class="quiz-list">
+                {% for result in quiz_results %}
+                    <li class="quiz-item">
+                        <div class="quiz-date">
+                            {{ result.date.strftime('%B %d, %Y at %I:%M %p') if result.date else 'Date not available' }}
+                        </div>
+                        <div class="quiz-score">
+                            Score: 
+                            {% if result.score is not none %}
+                                {{ result.score }}/5
+                                {% if result.score >= 4 %}
+                                    <span class="score-badge badge-excellent">Excellent!</span>
+                                {% elif result.score >= 3 %}
+                                    <span class="score-badge badge-good">Good Job!</span>
+                                {% else %}
+                                    <span class="score-badge badge-practice">Keep Practicing</span>
+                                {% endif %}
+                            {% else %}
+                                <span style="color: #999;">Not completed</span>
+                            {% endif %}
+                        </div>
+                    </li>
+                {% endfor %}
+                </ul>
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">📝</div>
+                    <p>No quiz history yet. Start taking quizzes to track your progress!</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Actions -->
+        <div class="actions">
+            <a href="{{ url_for('hello_world') }}" class="btn btn-primary">
+                <span>🏠</span> Back to Home
+            </a>
+            <a href="{{ url_for('hello_world') }}#quiz" class="btn btn-secondary">
+                <span>🎯</span> Take a Quiz
+            </a>
+        </div>
     </div>
 </body>
 </html>

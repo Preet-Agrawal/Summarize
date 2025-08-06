@@ -15,7 +15,7 @@ from dotenv import load_dotenv
 load_dotenv()
 app = Flask(__name__)
 CORS(app)
-app.secret_key = 'xai-XtKHVDRFI1u1HPepctwopF4wOqahJJxrGHtVt16BmZzRfoZ4DnOUsULXwUegivcGRzO7SCgGAv3jdtfU'
+app.secret_key = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
 bcrypt = Bcrypt(app)
 
 # Demo user store (replace with DB in production)

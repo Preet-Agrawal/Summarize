@@ -1,0 +1,13 @@
+{
+  "name": "summarize-app",
+  "version": "1.0.0",
+  "description": "Flask application with npm start support",
+  "scripts": {
+    "start": "PORT=3000 python app.py",
+    "dev": "PORT=3000 python app.py",
+    "install-deps": "pip install -r requirements.txt"
+  },
+  "keywords": ["flask", "python", "web"],
+  "author": "",
+  "license": "ISC"
+}
