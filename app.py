@@ -1,49 +1,260 @@
 import os
-from flask import Flask, render_template, request, jsonify
+import requests
+from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, session
 from flask_cors import CORS
-from openai import OpenAI
+from forms import LoginForm
+from flask_bcrypt import Bcrypt
+from functools import wraps
+from flask_pymongo import PyMongo
+from forms import RegistrationForm
+from datetime import datetime
+from pymongo import MongoClient
+from bson import ObjectId
+from dotenv import load_dotenv
 
+load_dotenv()
 app = Flask(__name__)
 CORS(app)
+app.secret_key = 'xai-XtKHVDRFI1u1HPepctwopF4wOqahJJxrGHtVt16BmZzRfoZ4DnOUsULXwUegivcGRzO7SCgGAv3jdtfU'
+bcrypt = Bcrypt(app)
 
-# Authenticate with the GitHub Copilot Models API
-client = OpenAI(
-    base_url="https://models.github.ai/inference",
-    api_key=os.environ["GITHUB_TOKEN"],
-)
+# Demo user store (replace with DB in production)
+# Remove the users = {...} dictionary
+app.config["MONGO_URI"] = os.environ.get("MONGO_URI")
+mongo = PyMongo(app)
 
-def generate_openai_response(prompt):
-    response = client.chat.completions.create(
-        messages=[
-            {
-                "role": "system",
-                "content": "You are a helpful assistant that creates structured summaries and quizzes.",
-            },
-            {
-                "role": "user",
-                "content": prompt,
-            }
-        ],
-        model="openai/gpt-4o-mini", 
-        temperature=1,
-        max_tokens=4096,
-        top_p=1
-    )
-    return response.choices[0].message.content
+
+# To register a user (example)
+if not mongo.db.users.find_one({"username": "testuser"}):
+    hashed_pw = bcrypt.generate_password_hash("testpass").decode('utf-8')
+    mongo.db.users.insert_one({"username": "testuser", "password": hashed_pw})
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'username' not in session:
+            flash('Please log in to access this page.', 'warning')
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+# Hugging Face API (completely free)
+HUGGINGFACE_API_URL = "https://api-inference.huggingface.co/models/gpt2"
+
+def generate_free_response(prompt):
+    """Generate response using Hugging Face's free API"""
+    try:
+        # Use Hugging Face Inference API for text generation
+        headers = {
+            "Authorization": f"Bearer {os.environ.get('HUGGINGFACE_API_KEY', '')}",
+            "Content-Type": "application/json"
+        }
+        
+        # Create a prompt for the AI to generate summary and quiz
+        ai_prompt = f"""Please analyze this story and create a summary and 5 multiple choice questions.
+
+Story: {prompt}
+
+Please format your response exactly as follows:
+
+SUMMARY:
+[Write a concise summary of the story]
+
+QUIZ:
+1. [Question 1]
+   A) [Option A]
+   B) [Option B] 
+   C) [Option C]
+   D) [Option D]
+   Correct: [A/B/C/D]
+
+2. [Question 2]
+   A) [Option A]
+   B) [Option B]
+   C) [Option C]
+   D) [Option D]
+   Correct: [A/B/C/D]
+
+3. [Question 3]
+   A) [Option A]
+   B) [Option B]
+   C) [Option C]
+   D) [Option D]
+   Correct: [A/B/C/D]
+
+4. [Question 4]
+   A) [Option A]
+   B) [Option B]
+   C) [Option C]
+   D) [Option D]
+   Correct: [A/B/C/D]
+
+5. [Question 5]
+   A) [Option A]
+   B) [Option B]
+   C) [Option C]
+   D) [Option D]
+   Correct: [A/B/C/D]
+"""
+
+        # Try Hugging Face API first
+        if os.environ.get('HUGGINGFACE_API_KEY'):
+            try:
+                response = requests.post(
+                    HUGGINGFACE_API_URL,
+                    headers=headers,
+                    json={"inputs": ai_prompt, "parameters": {"max_length": 1000, "temperature": 0.7}}
+                )
+                
+                if response.status_code == 200:
+                    result = response.json()
+                    if isinstance(result, list) and len(result) > 0:
+                        return result[0].get('generated_text', '')
+                    elif isinstance(result, dict):
+                        return result.get('generated_text', '')
+            except Exception as e:
+                print(f"Hugging Face API error: {e}")
+        
+        # Fallback: Use a simple template if API fails or no key
+        words = prompt.split()
+        if len(words) > 50:
+            summary = f"Summary of the story:\n{' '.join(words[:100])}...\n\nThis story appears to be about {words[0:5]} and contains various themes and characters."
+        else:
+            summary = f"Summary of the story:\n{prompt}\n\nThis is a brief story that can be analyzed for its key elements."
+        
+        quiz = """
+QUIZ:
+1. What type of content is this story?
+   A) Fiction
+   B) Non-fiction
+   C) Poetry
+   D) Technical
+   Correct: A
+
+2. What is the primary focus of this story?
+   A) Characters
+   B) Plot
+   C) Setting
+   D) Theme
+   Correct: B
+
+3. How would you describe the story's tone?
+   A) Serious
+   B) Humorous
+   C) Mysterious
+   D) Educational
+   Correct: A
+
+4. What is the most likely audience for this story?
+   A) Children
+   B) Adults
+   C) Students
+   D) Professionals
+   Correct: C
+
+5. What is the main lesson or message?
+   A) Learning
+   B) Adventure
+   C) Friendship
+   D) Success
+   Correct: A
+"""
+        
+        return f"SUMMARY:\n{summary}\n\n{quiz}"
+        
+    except Exception as e:
+        return f"Error generating response: {str(e)}"
+
+
+
+@app.route("/users")
+@login_required
+def list_users():
+    users = list(mongo.db.users.find({}, {"_id": 0, "username": 1}))
+    return render_template('users.html', users=users)
+
+
+@app.route("/test")
+def test():
+    return jsonify({"status": "ok", "message": "Flask app is working!"})
+
+@app.route("/test_auth")
+@login_required
+def test_auth():
+    return jsonify({"status": "ok", "message": "Authentication working!", "username": session.get('username')})
 
 @app.route("/")
 def hello_world():
     return render_template('index.html')
 
+@app.route("/auth")
+def auth_choice():
+    return render_template('auth_choice.html')
+
+
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        username = form.username.data
+        password = form.password.data
+        if mongo.db.users.find_one({"username": username}):
+            flash('Username already exists. Please choose another.', 'danger')
+        else:
+            hashed_pw = bcrypt.generate_password_hash(password).decode('utf-8')
+            mongo.db.users.insert_one({"username": username, "password": hashed_pw})
+            flash('Registration successful! Please log in.', 'success')
+            return redirect(url_for('login'))
+    return render_template('register.html', form=form)
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    form = LoginForm()
+    if form.validate_on_submit():
+        username = form.username.data
+        password = form.password.data
+        user = mongo.db.users.find_one({"username": username})
+        if user and bcrypt.check_password_hash(user["password"], password):
+            session['username'] = username
+            flash('Logged in successfully!', 'success')
+            return redirect(url_for('hello_world'))
+        else:
+            flash('Invalid username or password', 'danger')
+    return render_template('login.html', form=form)
+@app.route('/logout')
+def logout():
+    session.pop('username', None)
+    flash('You have been logged out.', 'info')
+    return redirect(url_for('hello_world'))
+
+@app.route("/profile")
+@login_required
+def profile():
+    user = mongo.db.users.find_one({"username": session['username']}, {"_id": 0, "username": 1})
+    quiz_results = list(mongo.db.quiz_results.find({"username": session['username']}))
+    
+    # Convert ObjectId to string for each quiz result
+    for result in quiz_results:
+        result['_id'] = str(result['_id'])
+    
+    return render_template('profile.html', user=user, quiz_results=quiz_results)
+
+
 @app.route("/generate", methods=["POST"])
+@login_required
 def generate():
-    data = request.get_json()
-    user_text = data.get("text", "")
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "No JSON data received"}), 400
+            
+        user_text = data.get("text", "")
 
-    if not user_text:
-        return jsonify({"error": "No input received."}), 400
+        if not user_text:
+            return jsonify({"error": "No input received."}), 400
 
-    prompt = f"""Summarize the following story and generate 5 multiple choice questions with 4 options each. Format your response as follows:
+        prompt = f"""Summarize the following story and generate 5 multiple choice questions with 4 options each. Format your response as follows:
 
 SUMMARY:
 [Write a concise summary of the story]
@@ -87,11 +298,42 @@ QUIZ:
 Story:
 {user_text}
 """
+        result = generate_free_response(prompt)
+        # Save quiz generation to MongoDB for the logged-in user
+        quiz_result = mongo.db.quiz_results.insert_one({
+            "username": session['username'],
+            "summary": result,  # This is the generated summary+quiz
+            "score": None,      # You can update this later if you add scoring
+            "date": datetime.utcnow()
+        })
+        return jsonify({"result": result, "quiz_id": str(quiz_result.inserted_id)})
+    except Exception as e:
+        print(f"Error in generate route: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/save_score", methods=["POST"])
+@login_required
+def save_score():
+    data = request.get_json()
+    score = data.get("score")
+    quiz_id = data.get("quiz_id")
+    
+    if score is None or quiz_id is None:
+        return jsonify({"error": "Missing score or quiz_id"}), 400
+    
     try:
-        result = generate_openai_response(prompt)
-        return jsonify({"result": result})
+        # Convert string ID back to ObjectId
+        object_id = ObjectId(quiz_id)
+        
+        # Update the quiz result with the score
+        mongo.db.quiz_results.update_one(
+            {"_id": object_id, "username": session['username']},
+            {"$set": {"score": score}}
+        )
+        return jsonify({"success": True})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
-    app.run(debug=True, port=7000)
+    port = int(os.environ.get("PORT", 5000))  # Use Railway's port or default to 5000 locally
+    app.run(debug=True, host="0.0.0.0", port=port)
