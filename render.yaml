@@ -12,7 +12,7 @@ services:
         value: 18
       - key: MONGO_URI
         sync: false
-      - key: GROQ_API_KEY
+      - key: HUGGINGFACE_API_KEY
         sync: false
       - key: SECRET_KEY
         generateValue: true
