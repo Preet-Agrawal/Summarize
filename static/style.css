@@ -13,10 +13,12 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 0.8rem 1.5rem;
-  background: white;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-  position: relative;
-  z-index: 100;
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(10px);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
   transition: all 0.3s ease;
 }
 .header-left {
@@ -36,7 +38,8 @@ body {
 .site-title {
   font-size: 1.4rem;
   font-weight: 700;
-  color: #333;
+  color: #4a5568;
+  letter-spacing: -0.5px;
 }
 .header-right, nav.header-right {
   display: flex;
@@ -49,16 +52,17 @@ body {
   display: inline-block;
   padding: 0.5rem 1rem;
   text-decoration: none;
-  color: #555;
+  color: #4a5568;
   font-size: 0.95rem;
   font-weight: 500;
-  border-radius: 6px;
-  transition: all 0.2s ease;
+  border-radius: 8px;
+  transition: all 0.3s ease;
 }
 
 .nav-link:hover {
-  background: #f0f0f0;
-  color: #333;
+  background: rgba(102, 126, 234, 0.1);
+  color: #667eea;
+  transform: translateY(-1px);
 }
 
 .main {
@@ -236,24 +240,12 @@ body {
   transform: translateX(-50%);
   background: white;
   min-width: 250px;
-  border-radius: 15px;
+  border-radius: 12px;
   padding: 0.5rem;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(102, 126, 234, 0.1);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  border: 1px solid rgba(0, 0, 0, 0.05);
   z-index: 1001;
   margin-top: 0.5rem;
-  animation: dropdownFade 0.3s ease;
-}
-
-@keyframes dropdownFade {
-  from {
-    opacity: 0;
-    transform: translateX(-50%) translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-  }
 }
 
 .dropdown:hover .dropdown-content,
@@ -263,19 +255,19 @@ body {
 
 .dropdown-content a {
   display: block;
-  padding: 0.8rem 1rem;
+  padding: 0.7rem 1rem;
   color: #4a5568;
   font-size: 0.9rem;
   text-decoration: none;
-  border-radius: 10px;
+  border-radius: 8px;
   transition: all 0.2s ease;
   margin: 0.2rem 0;
 }
 
 .dropdown-content a:hover {
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  background: rgba(102, 126, 234, 0.08);
   color: #667eea;
-  transform: translateX(5px);
+  padding-left: 1.2rem;
 }
 
 /* Loading Section */
@@ -643,7 +635,8 @@ body::before {
 .site-title {
   font-size: 1.4rem;
   font-weight: 700;
-  color: #333;
+  color: #4a5568;
+  letter-spacing: -0.5px;
 }
 .header-right {
   display: flex;
