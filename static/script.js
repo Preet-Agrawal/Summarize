@@ -2,6 +2,7 @@ let quizData = [];
 let userAnswers = [];
 let score = 0;
 let quizCompleted = false;
+let currentQuizId = null;
 
 async function submitStory() {
   const inputText = document.getElementById("storyInput").value.trim();
@@ -35,9 +36,25 @@ async function submitStory() {
     // Parse and display the result
     parseAndDisplayResult(data.result);
     
+    // Store the quiz ID for later use
+    if (data.quiz_id) {
+      currentQuizId = data.quiz_id;
+    }
+    
+    // Show success notification
+    showSuccessNotification();
+    
   } catch (error) {
     document.getElementById("loadingSection").style.display = "none";
-    alert("Error: " + error.message);
+    
+    // Check if it's an authentication error (HTML response instead of JSON)
+    if (error.message.includes("Unexpected token '<'") || 
+        error.message.includes("JSON") || 
+        error.message.includes("Failed to fetch")) {
+      showLoginPopup();
+    } else {
+      alert("Error: " + error.message);
+    }
   }
 }
 
@@ -179,7 +196,7 @@ function selectOption(questionIndex, selectedOption) {
   }
 }
 
-function showFinalResults() {
+async function showFinalResults() {
   quizCompleted = true;
   const finalScoreDiv = document.getElementById("finalScore");
   const performanceDiv = document.getElementById("performanceMessage");
@@ -209,6 +226,26 @@ function showFinalResults() {
   
   performanceDiv.textContent = performanceMessage;
   document.getElementById("quizResults").style.display = "block";
+  
+  // Save the score to the database
+  if (currentQuizId) {
+    try {
+      const response = await fetch("/save_score", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          score: score, 
+          quiz_id: currentQuizId 
+        }),
+      });
+      
+      if (!response.ok) {
+        console.error("Failed to save score");
+      }
+    } catch (error) {
+      console.error("Error saving score:", error);
+    }
+  }
 }
 
 function resetQuiz() {
@@ -231,4 +268,79 @@ function resetQuiz() {
   feedbacks.forEach(feedback => {
     feedback.innerHTML = '';
   });
+} 
+
+function showLoginPopup() {
+  const popup = document.createElement('div');
+  popup.className = 'login-popup-overlay';
+  popup.innerHTML = `
+    <div class="login-popup">
+      <div class="login-popup-header">
+        <h3>🔐 Login Required</h3>
+        <button class="close-popup" onclick="closeLoginPopup()">×</button>
+      </div>
+      <div class="login-popup-content">
+        <p>You need to log in first to use the Summarize & Quiz feature!</p>
+        <div class="login-popup-buttons">
+          <button class="login-btn" onclick="goToLogin()">Login Now</button>
+          <button class="register-btn" onclick="goToRegister()">Register</button>
+        </div>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(popup);
+  
+  // Add fade-in animation
+  setTimeout(() => popup.classList.add('show'), 10);
+  
+  // Close popup when clicking outside
+  popup.addEventListener('click', function(e) {
+    if (e.target === popup) {
+      closeLoginPopup();
+    }
+  });
+  
+  // Close popup with Escape key
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      closeLoginPopup();
+    }
+  });
+}
+
+function closeLoginPopup() {
+  const popup = document.querySelector('.login-popup-overlay');
+  if (popup) {
+    popup.classList.remove('show');
+    setTimeout(() => popup.remove(), 300);
+  }
+}
+
+function goToLogin() {
+  window.location.href = '/login';
+}
+
+function goToRegister() {
+  window.location.href = '/register';
+} 
+
+function showSuccessNotification() {
+  const notification = document.createElement('div');
+  notification.className = 'success-notification';
+  notification.innerHTML = `
+    <div class="success-content">
+      <span class="success-icon">✅</span>
+      <span class="success-text">Quiz generated successfully!</span>
+    </div>
+  `;
+  document.body.appendChild(notification);
+  
+  // Show notification
+  setTimeout(() => notification.classList.add('show'), 100);
+  
+  // Hide notification after 3 seconds
+  setTimeout(() => {
+    notification.classList.remove('show');
+    setTimeout(() => notification.remove(), 300);
+  }, 3000);
 } 
