@@ -41,6 +41,13 @@ except ImportError:
     print('❌ Gunicorn not found')
     sys.exit(1)
 
+try:
+    import groq
+    print('✅ Groq API client installed')
+except ImportError:
+    print('❌ Groq not found')
+    sys.exit(1)
+
 print('✅ All critical dependencies verified')
 "
 

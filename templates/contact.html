@@ -372,6 +372,80 @@
             font-weight: 500;
         }
 
+        /* Message Display */
+        .flash-messages {
+            margin-bottom: 2rem;
+        }
+        
+        .flash-message {
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+            font-weight: 500;
+            animation: slideDown 0.3s ease-out;
+            position: relative;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .flash-message.success {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+        
+        .flash-message.error {
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+        
+        .flash-message.info {
+            background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+            color: #0c5460;
+            border-left: 4px solid #17a2b8;
+        }
+        
+        .flash-message.warning {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeeba 100%);
+            color: #856404;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .flash-message-icon {
+            display: inline-block;
+            margin-right: 0.5rem;
+            font-size: 1.2rem;
+            vertical-align: middle;
+        }
+        
+        .flash-message .close-btn {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            opacity: 0.5;
+            transition: opacity 0.2s;
+        }
+        
+        .flash-message .close-btn:hover {
+            opacity: 1;
+        }
+
         /* Contact Form */
         .contact-form {
             background: white;
@@ -696,6 +770,32 @@
         <!-- Contact Form -->
         <div class="contact-form">
             <h2>Send Us a Message</h2>
+            
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for category, message in messages %}
+                            <div class="flash-message {{ category }}">
+                                <span class="flash-message-icon">
+                                    {% if category == 'success' %}
+                                        ✓
+                                    {% elif category == 'error' %}
+                                        ✗
+                                    {% elif category == 'warning' %}
+                                        ⚠
+                                    {% else %}
+                                        ℹ
+                                    {% endif %}
+                                </span>
+                                {{ message }}
+                                <button class="close-btn" onclick="this.parentElement.style.display='none'">×</button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+            
             <form action="{{ url_for('contact_submit') }}" method="POST">
                 <div class="form-group">
                     <label for="name">Your Name</label>
@@ -724,5 +824,33 @@
     </div>
     
     <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script>
+        // Auto-dismiss success messages after 5 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            const successMessages = document.querySelectorAll('.flash-message.success');
+            successMessages.forEach(function(message) {
+                setTimeout(function() {
+                    message.style.transition = 'opacity 0.5s';
+                    message.style.opacity = '0';
+                    setTimeout(function() {
+                        message.style.display = 'none';
+                    }, 500);
+                }, 5000);
+            });
+            
+            // Add form submission feedback
+            const contactForm = document.querySelector('form[action*="contact_submit"]');
+            if (contactForm) {
+                contactForm.addEventListener('submit', function() {
+                    const submitBtn = this.querySelector('.submit-btn');
+                    if (submitBtn) {
+                        submitBtn.textContent = 'Sending...';
+                        submitBtn.style.opacity = '0.7';
+                        submitBtn.disabled = true;
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>
