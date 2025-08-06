@@ -12,15 +12,12 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.7rem 1.2rem;
-  background: rgba(255,255,255,0.85);
-  box-shadow: 0 4px 24px rgba(80, 80, 160, 0.08);
-  backdrop-filter: blur(12px);
-  border-radius: 0 0 12px 12px;
+  padding: 0.8rem 1.5rem;
+  background: white;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
   position: relative;
-  z-index: 10;
-  margin-bottom: 0.2rem;
-  transition: background 0.3s;
+  z-index: 100;
+  transition: all 0.3s ease;
 }
 .header-left {
   display: flex;
@@ -31,18 +28,15 @@ body {
   width: 40px;
   height: 40px;
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(100, 80, 160, 0.08);
-  transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  transition: transform 0.3s ease;
 }
 .logo:hover {
-  transform: scale(1.12) rotate(-8deg);
+  transform: scale(1.05);
 }
 .site-title {
   font-size: 1.4rem;
-  font-weight: 800;
-  color: #3a3a8a;
-  letter-spacing: 1.5px;
-  text-shadow: 0 2px 8px rgba(185, 147, 214, 0.08);
+  font-weight: 700;
+  color: #333;
 }
 .header-right, nav.header-right {
   display: flex;
@@ -53,25 +47,18 @@ body {
 
 .nav-link {
   display: inline-block;
-  padding: 0.5em 1em;
+  padding: 0.5rem 1rem;
   text-decoration: none;
-  color: #3a3a8a;
-  font-size: 1em;
+  color: #555;
+  font-size: 0.95rem;
+  font-weight: 500;
   border-radius: 6px;
-  transition: background 0.2s, color 0.2s;
+  transition: all 0.2s ease;
 }
 
 .nav-link:hover {
-  background: #ececff;
-  color: #6c63ff;
-}
-
-.nav-link:hover {
-  color: #7b5fa1;
-  background: rgba(185, 147, 214, 0.08);
-}
-.nav-link:hover::after {
-  transform: scaleX(1);
+  background: #f0f0f0;
+  color: #333;
 }
 
 .main {
@@ -239,49 +226,56 @@ body {
 .dropdown {
   position: relative;
   display: inline-block;
-  padding: 0.2rem 0.3rem;
 }
-
 
 .dropdown-content {
   display: none;
   position: absolute;
-  top: 38px;
-  left: 0;
-  background: rgba(242, 206, 255, 0.98);
-  min-width: 220px;
-  border: 1px solid #e3d0f7;
-  z-index: 100;
-  border-radius: 12px;
-  padding: 10px 0;
-  box-shadow: 0 8px 24px rgba(80, 80, 160, 0.10);
-  opacity: 0;
-  transform: translateY(10px) scale(0.98);
-  pointer-events: none;
-  transition: opacity 0.3s, transform 0.3s;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  min-width: 250px;
+  border-radius: 15px;
+  padding: 0.5rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(102, 126, 234, 0.1);
+  z-index: 1001;
+  margin-top: 0.5rem;
+  animation: dropdownFade 0.3s ease;
+}
+
+@keyframes dropdownFade {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
 }
 
 .dropdown:hover .dropdown-content,
 .dropdown:focus-within .dropdown-content {
   display: block;
-  opacity: 1;
-  transform: translateY(0) scale(1);
-  pointer-events: auto;
 }
 
 .dropdown-content a {
   display: block;
-  padding: 0.7rem 1.2rem;
-  color: #3a3a8a;
-  font-size: 1rem;
+  padding: 0.8rem 1rem;
+  color: #4a5568;
+  font-size: 0.9rem;
   text-decoration: none;
-  border-radius: 6px;
-  transition: background 0.2s, color 0.2s;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+  margin: 0.2rem 0;
 }
 
 .dropdown-content a:hover {
-  background: #e9e3f7;
-  color: #7b5fa1;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  color: #667eea;
+  transform: translateX(5px);
 }
 
 /* Loading Section */
@@ -641,18 +635,15 @@ body::before {
   width: 40px;
   height: 40px;
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(100, 80, 160, 0.08);
-  transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  transition: transform 0.3s ease;
 }
 .logo:hover {
-  transform: scale(1.12) rotate(-8deg);
+  transform: scale(1.05);
 }
 .site-title {
   font-size: 1.4rem;
-  font-weight: 800;
-  color: #3a3a8a;
-  letter-spacing: 1.5px;
-  text-shadow: 0 2px 8px rgba(185, 147, 214, 0.08);
+  font-weight: 700;
+  color: #333;
 }
 .header-right {
   display: flex;

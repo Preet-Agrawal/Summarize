@@ -362,17 +362,11 @@
         </div>
         <nav class="header-right">
             <a href="{{ url_for('hello_world') }}" class="nav-link">Home</a>
+            <a href="{{ url_for('contact') }}" class="nav-link">Contact</a>
             <div class="dropdown">
                 <a href="#" class="nav-link">About</a>
                 <div class="dropdown-content">
                     <a href="#">This is a project made by 3rd Year student of IIIT Surat</a>
-                </div>
-            </div>
-            <div class="dropdown">
-                <a href="#" class="nav-link">Contact Us</a>
-                <div class="dropdown-content">
-                    <a href="#">Preet Kumar, 7004613120</a>
-                    <a href="#">Kalpana Singh, 9555546882</a>
                 </div>
             </div>
             {% if 'username' in session %}

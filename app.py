@@ -11,12 +11,23 @@ from datetime import datetime
 from pymongo import MongoClient
 from bson import ObjectId
 from dotenv import load_dotenv
+from flask_mail import Mail, Message
 
 load_dotenv()
 app = Flask(__name__)
 CORS(app)
 app.secret_key = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
 bcrypt = Bcrypt(app)
+
+# Email configuration
+app.config['MAIL_SERVER'] = os.environ.get('MAIL_SERVER', 'smtp.gmail.com')
+app.config['MAIL_PORT'] = int(os.environ.get('MAIL_PORT', 587))
+app.config['MAIL_USE_TLS'] = os.environ.get('MAIL_USE_TLS', 'True').lower() == 'true'
+app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
+app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER')
+
+mail = Mail(app)
 
 # Demo user store (replace with DB in production)
 # Remove the users = {...} dictionary
@@ -333,6 +344,76 @@ def save_score():
         return jsonify({"success": True})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@app.route("/contact")
+def contact():
+    return render_template("contact.html")
+
+@app.route("/contact_submit", methods=["POST"])
+def contact_submit():
+    # Get form data
+    name = request.form.get('name')
+    email = request.form.get('email')
+    subject = request.form.get('subject')
+    message = request.form.get('message')
+    
+    # Store in MongoDB if you want to save contact messages
+    if name and email and message:
+        mongo.db.contact_messages.insert_one({
+            "name": name,
+            "email": email,
+            "subject": subject,
+            "message": message,
+            "date": datetime.utcnow()
+        })
+        
+        # Send email notification if email is configured
+        if app.config['MAIL_USERNAME'] and app.config['MAIL_PASSWORD']:
+            try:
+                # Send email to admin
+                admin_email = os.environ.get('ADMIN_EMAIL', app.config['MAIL_USERNAME'])
+                msg = Message(
+                    subject=f"New Contact Form Submission: {subject}",
+                    sender=app.config['MAIL_DEFAULT_SENDER'],
+                    recipients=[admin_email]
+                )
+                msg.html = f"""
+                <h3>New Contact Form Submission</h3>
+                <p><strong>Name:</strong> {name}</p>
+                <p><strong>Email:</strong> {email}</p>
+                <p><strong>Subject:</strong> {subject}</p>
+                <p><strong>Message:</strong></p>
+                <p>{message}</p>
+                <hr>
+                <p><small>Submitted on {datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')}</small></p>
+                """
+                mail.send(msg)
+                
+                # Send confirmation email to user
+                user_msg = Message(
+                    subject="Thank you for contacting Story Quiz",
+                    sender=app.config['MAIL_DEFAULT_SENDER'],
+                    recipients=[email]
+                )
+                user_msg.html = f"""
+                <h3>Thank you for reaching out, {name}!</h3>
+                <p>We have received your message and will get back to you soon.</p>
+                <p><strong>Your message:</strong></p>
+                <p>{message}</p>
+                <hr>
+                <p>Best regards,<br>Story Quiz Team</p>
+                """
+                mail.send(user_msg)
+                
+            except Exception as e:
+                print(f"Email sending failed: {e}")
+                # Don't show error to user, just log it
+        
+        flash('Thank you for your message! We will get back to you soon.', 'success')
+    else:
+        flash('Please fill in all required fields.', 'error')
+    
+    return redirect(url_for('contact'))
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))  # Use Railway's port or default to 5000 locally
