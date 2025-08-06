@@ -416,5 +416,12 @@ def contact_submit():
     return redirect(url_for('contact'))
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))  # Use Railway's port or default to 5000 locally
-    app.run(debug=True, host="0.0.0.0", port=port)
+    port = int(os.environ.get("PORT", 5000))  # Use environment port or default to 5000
+    host = os.environ.get("HOST", "127.0.0.1")  # Default to localhost for local development
+    debug = os.environ.get("FLASK_ENV", "development") == "development"
+    
+    print(f"Starting Story Quiz application...")
+    print(f"Running on http://{host}:{port}")
+    print(f"Debug mode: {debug}")
+    
+    app.run(debug=debug, host=host, port=port)

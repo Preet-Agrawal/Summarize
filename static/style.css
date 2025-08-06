@@ -48,6 +48,39 @@ body {
   gap: 2em;
 }
 
+/* Hamburger Menu Button */
+.menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  z-index: 1002;
+  position: relative;
+}
+
+.menu-toggle span {
+  display: block;
+  width: 25px;
+  height: 3px;
+  background: #4a5568;
+  margin: 5px 0;
+  transition: all 0.3s ease;
+  border-radius: 2px;
+}
+
+.menu-toggle.active span:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+.menu-toggle.active span:nth-child(2) {
+  opacity: 0;
+}
+
+.menu-toggle.active span:nth-child(3) {
+  transform: rotate(-45deg) translate(7px, -6px);
+}
+
 .nav-link {
   display: inline-block;
   padding: 0.5rem 1rem;
@@ -171,45 +204,424 @@ body {
   box-shadow: 0 0 0 3px rgba(185, 147, 214, 0.3);
 }
 
-@media (max-width: 700px) {
+/* Responsive Design - Tablet View */
+@media (max-width: 1024px) {
+  .main {
+    padding: 0 1.5rem;
+  }
+  
+  .result-section {
+    max-width: 90%;
+    padding: 1.5rem 1rem;
+  }
+  
+  .content-grid {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  }
+}
+
+/* Responsive Design - Mobile Landscape/Small Tablet */
+@media (max-width: 768px) {
   .header {
-    padding: 0.7rem 0.3rem 0.3rem 0.3rem;
+    padding: 0.7rem 1rem;
+    position: relative;
+  }
+  
+  .menu-toggle {
+    display: block;
+  }
+  
+  .header-right, nav.header-right {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: rgba(255,255,255,0.98);
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: 1rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    border-radius: 0 0 12px 12px;
+    z-index: 1001;
+  }
+  
+  .header-right.active, nav.header-right.active {
+    display: flex;
+  }
+  
+  .nav-link {
+    padding: 0.8rem 1rem;
+    font-size: 0.95rem;
+    text-align: left;
+    border-radius: 8px;
+    width: 100%;
+  }
+  
+  .nav-link:hover {
+    background: rgba(102, 126, 234, 0.1);
+  }
+  
+  .dropdown {
+    width: 100%;
+  }
+  
+  .dropdown-content {
+    position: static;
+    display: none;
+    width: 100%;
+    transform: none;
+    box-shadow: none;
+    background: rgba(242, 206, 255, 0.1);
+    margin-top: 0.5rem;
+    margin-left: 1rem;
+  }
+  
+  .dropdown:hover .dropdown-content,
+  .dropdown.active .dropdown-content {
+    display: block;
+  }
+  
+  .main-heading {
+    font-size: 2.2rem;
+    line-height: 1.2;
+  }
+  
+  .description {
+    font-size: 1rem;
+    padding: 0 1rem;
+  }
+  
+  .text-area-container textarea {
+    width: 95%;
+    font-size: 0.95rem;
+  }
+  
+  .get-started, .submit-btn, .reset-btn {
+    font-size: 1rem;
+    padding: 0.8rem 1.8rem;
+  }
+  
+  .result-section {
+    padding: 1.5rem 1rem;
+    margin: 1.5rem auto;
+  }
+  
+  .section-title {
+    font-size: 1.3rem;
+  }
+  
+  .summary-content {
+    font-size: 1rem;
+    padding: 0.8rem;
+  }
+  
+  .quiz-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1em;
+  }
+  
+  .score-display {
+    justify-content: space-between;
+    width: 100%;
+  }
+  
+  .dropdown-content {
+    min-width: 200px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+/* Responsive Design - Mobile Portrait */
+@media (max-width: 480px) {
+  body {
+    font-size: 14px;
+  }
+  
+  .header {
+    padding: 0.6rem 0.5rem;
     border-radius: 0 0 8px 8px;
   }
+  
+  .header-left {
+    gap: 0.8rem;
+  }
+  
+  .logo {
+    width: 35px;
+    height: 35px;
+  }
+  
   .site-title {
     font-size: 1.1rem;
   }
+  
+  
+  .main {
+    min-height: auto;
+    padding: 1rem 0.5rem;
+  }
+  
+  .center-content {
+    margin-top: 1.5rem;
+  }
+  
   .main-heading {
-    font-size: 2rem;
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    padding: 0 0.5rem;
   }
+  
   .description {
-    font-size: 1rem;
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+    padding: 0 0.5rem;
+    max-width: 100%;
   }
+  
+  .text-input-section {
+    margin-top: 1.5rem;
+    padding: 0 0.5rem;
+  }
+  
+  .text-area-container textarea {
+    width: 100%;
+    max-width: 100%;
+    height: 120px;
+    padding: 0.8rem;
+    font-size: 0.9rem;
+  }
+  
   .get-started, .submit-btn, .reset-btn {
-    font-size: 1rem;
+    font-size: 0.95rem;
     padding: 0.7rem 1.5rem;
+    width: 90%;
+    max-width: 300px;
+    margin: 0.5em auto;
+    display: block;
   }
+  
+  .loading-section {
+    padding: 1.5rem;
+    margin: 1rem;
+  }
+  
+  .loading-spinner {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .loading-section p {
+    font-size: 1rem;
+  }
+  
   .result-section {
-    padding: 1.2rem 0.5rem;
+    width: 95%;
+    padding: 1rem 0.8rem;
+    margin: 1rem auto;
   }
+  
+  .section-title {
+    font-size: 1.2rem;
+    margin-bottom: 0.8rem;
+  }
+  
+  .summary-content {
+    font-size: 0.95rem;
+    padding: 0.8rem;
+    margin-bottom: 1rem;
+  }
+  
   .quiz-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5em;
+    margin-bottom: 0.8rem;
   }
+  
   .score-display {
     flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5em;
+    align-items: stretch;
+    gap: 0.8em;
+    width: 100%;
   }
+  
+  #scoreText {
+    font-size: 1rem;
+    padding: 0.5em 0.8em;
+    text-align: center;
+    margin-right: 0;
+  }
+  
+  .reset-btn {
+    width: 100%;
+    padding: 0.6em 1em;
+  }
+  
+  .question-container {
+    padding: 1em 0.8em;
+    margin-bottom: 1em;
+  }
+  
+  .question-title {
+    font-size: 1rem;
+  }
+  
+  .question-text {
+    font-size: 0.95rem;
+  }
+  
   .options-container {
     flex-direction: column;
     gap: 0.5em;
   }
+  
   .option-btn {
     width: 100%;
-    font-size: 1em;
-    padding: 0.7em 0.5em;
+    font-size: 0.9em;
+    padding: 0.7em 0.8em;
+    text-align: left;
+  }
+  
+  .quiz-results {
+    padding: 1em 0.8em;
+    margin-top: 1em;
+  }
+  
+  .quiz-results h3 {
+    font-size: 1.2rem;
+  }
+  
+  .quiz-results p {
+    font-size: 0.95rem;
+  }
+  
+  #finalScore {
+    font-size: 1.1rem;
+  }
+  
+  #performanceMessage {
+    font-size: 1rem;
+  }
+  
+  /* Floating shapes smaller on mobile */
+  .floating-shape.shape1 {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .floating-shape.shape2 {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .floating-shape.shape3 {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .floating-shape.shape4 {
+    width: 90px;
+    height: 90px;
+  }
+  
+  /* Login popup responsive */
+  .login-popup {
+    width: 95%;
+    max-width: 95%;
+    margin: 0.5rem;
+  }
+  
+  .login-popup-header {
+    padding: 1rem 1.5rem;
+  }
+  
+  .login-popup-header h3 {
+    font-size: 1.1rem;
+  }
+  
+  .login-popup-content {
+    padding: 1.5rem;
+  }
+  
+  .login-popup-content p {
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+  }
+  
+  .login-popup-buttons {
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+  
+  .login-btn, .register-btn {
+    width: 100%;
+    padding: 0.7rem 1.2rem;
+    font-size: 0.95rem;
+  }
+  
+  /* Success notification responsive */
+  .success-notification {
+    top: 10px;
+    right: 10px;
+    left: 10px;
+    padding: 0.8rem 1rem;
+    transform: translateY(-100px);
+  }
+  
+  .success-notification.show {
+    transform: translateY(0);
+  }
+  
+  .success-text {
+    font-size: 0.9rem;
+  }
+}
+
+/* Very Small Mobile Devices */
+@media (max-width: 360px) {
+  .header {
+    padding: 0.5rem 0.3rem;
+  }
+  
+  .site-title {
+    font-size: 1rem;
+  }
+  
+  .nav-link {
+    padding: 0.3rem 0.5rem;
+    font-size: 0.8rem;
+  }
+  
+  .main-heading {
+    font-size: 1.5rem;
+  }
+  
+  .description {
+    font-size: 0.9rem;
+  }
+  
+  .text-area-container textarea {
+    height: 100px;
+    font-size: 0.85rem;
+  }
+  
+  .get-started, .submit-btn, .reset-btn {
+    font-size: 0.9rem;
+    padding: 0.6rem 1.2rem;
+  }
+  
+  .section-title {
+    font-size: 1.1rem;
+  }
+  
+  .summary-content {
+    font-size: 0.9rem;
+  }
+  
+  .option-btn {
+    font-size: 0.85em;
+    padding: 0.6em 0.7em;
   }
 }
 
@@ -718,47 +1130,6 @@ body::before {
   color: #7b5fa1;
 }
 
-/* Responsive Header */
-@media (max-width: 700px) {
-  .header {
-    padding: 0.7rem 0.3rem 0.3rem 0.3rem;
-    border-radius: 0 0 8px 8px;
-  }
-  .site-title {
-    font-size: 1.1rem;
-  }
-}
-
-/* Mobile styles */
-@media (max-width: 600px) {
-  .header {
-    flex-direction: row;
-    flex-wrap: wrap;
-    padding: 0.5rem 0.3rem;
-  }
-  .header-left {
-    flex-direction: row;
-    align-items: center;
-    gap: 0.5rem;
-  }
-  .site-title {
-    font-size: 1.1rem;
-  }
-  .header-right, nav.header-right {
-    flex-direction: row !important;
-    align-items: center;
-    gap: 0.7em;
-    width: auto;
-    justify-content: flex-end;
-  }
-  .nav-link {
-    width: auto;
-    text-align: center;
-    font-size: 1em;
-    padding: 0.5em 0.5em;
-    margin: 0 0.1em;
-  }
-}
 
 /* Login Popup Styles */
 .login-popup-overlay {
@@ -881,21 +1252,6 @@ body::before {
   transform: translateY(-2px);
 }
 
-/* Responsive design for popup */
-@media (max-width: 480px) {
-  .login-popup {
-    width: 95%;
-    margin: 1rem;
-  }
-  
-  .login-popup-buttons {
-    flex-direction: column;
-  }
-  
-  .login-btn, .register-btn {
-    width: 100%;
-  }
-}
 
 /* Success Notification */
 .success-notification {
@@ -931,16 +1287,3 @@ body::before {
   font-size: 0.95rem;
 }
 
-/* Responsive design for success notification */
-@media (max-width: 480px) {
-  .success-notification {
-    top: 10px;
-    right: 10px;
-    left: 10px;
-    transform: translateY(-100px);
-  }
-  
-  .success-notification.show {
-    transform: translateY(0);
-  }
-}

@@ -1,125 +1,606 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Register</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Story Quiz</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <style>
-      .auth-card {
-        max-width: 370px;
-        margin: 4rem auto 0 auto;
-        background: rgba(255,255,255,0.97);
-        border-radius: 16px;
-        box-shadow: 0 4px 24px rgba(80, 80, 160, 0.13);
-        padding: 2.2rem 2rem 1.5rem 2rem;
-        position: relative;
-        z-index: 3;
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
       }
-      .auth-card h2 {
-        text-align: center;
-        color: #6c63ff;
-        margin-bottom: 1.5rem;
-        font-weight: 800;
-        letter-spacing: 1px;
+      
+      body {
+        min-height: 100vh;
+        background: #f5f7fa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        padding: 1rem;
       }
-      .auth-form-group {
-        margin-bottom: 1.2rem;
-      }
-      .auth-form-group label {
-        font-weight: 600;
-        color: #3a3a8a;
-        margin-bottom: 0.3rem;
-        display: block;
-      }
-      .auth-form-group input {
+      
+      .auth-container {
         width: 100%;
-        padding: 0.7rem 1rem;
-        border-radius: 7px;
-        border: 1.2px solid #b993d6;
+        max-width: 900px;
+        display: flex;
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        border: 1px solid #e8ecf0;
+      }
+      
+      .auth-left {
+        flex: 1;
+        background: linear-gradient(135deg, #825ee4 0%, #5e72e4 100%);
+        padding: 3rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+      }
+      
+      
+      .auth-left h1 {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        font-weight: 700;
+      }
+      
+      .auth-left p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        margin-bottom: 2rem;
+        line-height: 1.6;
+      }
+      
+      .feature-list {
+        list-style: none;
+        text-align: left;
+      }
+      
+      .feature-list li {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
         font-size: 1rem;
-        background: #f7f7ff;
-        margin-top: 0.2rem;
-        transition: border 0.2s;
       }
-      .auth-form-group input:focus {
-        border-color: #6c63ff;
+      
+      .feature-list li::before {
+        content: '✨';
+        display: inline-block;
+        width: 25px;
+        height: 25px;
+        background: rgba(255,255,255,0.2);
+        border-radius: 50%;
+        text-align: center;
+        line-height: 25px;
+        margin-right: 0.8rem;
+      }
+      
+      .auth-right {
+        flex: 1;
+        padding: 3rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+      
+      .back-home {
+        position: absolute;
+        top: 2rem;
+        right: 2rem;
+        text-decoration: none;
+        color: #5e72e4;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        background: #f7f9fc;
+      }
+      
+      .back-home:hover {
+        transform: translateX(-3px);
+        background: #e8ecf0;
+      }
+      
+      .auth-card {
+        width: 100%;
+      }
+      
+      .auth-card h2 {
+        font-size: 2rem;
+        color: #333;
+        margin-bottom: 0.5rem;
+        font-weight: 700;
+      }
+      
+      .auth-subtitle {
+        color: #666;
+        margin-bottom: 2rem;
+        font-size: 0.95rem;
+      }
+      
+      .auth-form-group {
+        margin-bottom: 1.5rem;
+        position: relative;
+      }
+      
+      .auth-form-group label {
+        display: block;
+        font-weight: 600;
+        color: #555;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      
+      .input-wrapper {
+        position: relative;
+      }
+      
+      .input-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #999;
+      }
+      
+      .auth-input {
+        width: 100%;
+        padding: 0.9rem 1rem 0.9rem 2.8rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        font-size: 1rem;
+        transition: border-color 0.2s, background-color 0.2s;
+        background: #f8f9fa;
+      }
+      
+      .auth-input:focus {
+        border-color: #5e72e4;
+        background: white;
         outline: none;
+        box-shadow: 0 0 0 3px rgba(94, 114, 228, 0.1);
       }
+      
+      .password-strength {
+        margin-top: 0.5rem;
+        height: 4px;
+        background: #e0e0e0;
+        border-radius: 2px;
+        overflow: hidden;
+      }
+      
+      .password-strength-bar {
+        height: 100%;
+        width: 0%;
+        transition: width 0.3s, background-color 0.3s;
+        border-radius: 2px;
+      }
+      
+      .password-strength-weak {
+        width: 33%;
+        background: #ff4444;
+      }
+      
+      .password-strength-medium {
+        width: 66%;
+        background: #ffbb33;
+      }
+      
+      .password-strength-strong {
+        width: 100%;
+        background: #00C851;
+      }
+      
+      .terms-checkbox {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+        font-size: 0.9rem;
+      }
+      
+      .terms-checkbox input[type='checkbox'] {
+        margin-top: 0.2rem;
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+      }
+      
+      .terms-checkbox label {
+        color: #666;
+        line-height: 1.4;
+      }
+      
+      .terms-checkbox a {
+        color: #5e72e4;
+        text-decoration: none;
+      }
+      
+      .terms-checkbox a:hover {
+        text-decoration: underline;
+      }
+      
       .auth-btn {
         width: 100%;
-        padding: 0.9rem 0;
-        font-size: 1.1rem;
-        font-weight: 700;
-        color: #fff;
-        background: linear-gradient(90deg, #b993d6 0%, #6c63ff 100%);
+        padding: 1rem;
+        background: linear-gradient(135deg, #825ee4 0%, #5e72e4 100%);
+        color: white;
         border: none;
-        border-radius: 7px;
-        cursor: pointer;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        margin-top: 0.5em;
-        transition: background 0.2s, transform 0.2s;
-      }
-      .auth-btn:hover {
-        background: linear-gradient(90deg, #6c63ff 0%, #b993d6 100%);
-        transform: translateY(-2px) scale(1.03);
-      }
-      .auth-messages {
-        margin-top: 1.2rem;
-        text-align: center;
-      }
-      .auth-messages li {
-        list-style: none;
-        color: #b71c1c;
+        border-radius: 10px;
+        font-size: 1.1rem;
         font-weight: 600;
-        margin-bottom: 0.5em;
+        cursor: pointer;
+        transition: box-shadow 0.2s, opacity 0.2s;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        box-shadow: 0 4px 15px rgba(94, 114, 228, 0.2);
       }
-      .auth-input {
-  width: 100%;
-  padding: 0.7rem 1rem;
-  border-radius: 7px;
-  border: 1.2px solid #b993d6;
-  font-size: 1rem;
-  background: #f7f7ff;
-  margin-top: 0.2rem;
-  transition: border 0.2s;
-  box-sizing: border-box;
-}
-.auth-input:focus {
-  border-color: #6c63ff;
-  outline: none;
-}
+      
+      .auth-btn:hover {
+        box-shadow: 0 6px 20px rgba(94, 114, 228, 0.3);
+        opacity: 0.95;
+      }
+      
+      .auth-btn:active {
+        box-shadow: 0 2px 10px rgba(94, 114, 228, 0.2);
+      }
+      
+      .divider {
+        text-align: center;
+        margin: 2rem 0;
+        position: relative;
+      }
+      
+      .divider::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: #e0e0e0;
+      }
+      
+      .divider span {
+        background: white;
+        padding: 0 1rem;
+        position: relative;
+        color: #999;
+        font-size: 0.9rem;
+      }
+      
+      .signin-link {
+        text-align: center;
+        margin-top: 2rem;
+        color: #666;
+        font-size: 0.95rem;
+      }
+      
+      .signin-link a {
+        color: #5e72e4;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s;
+      }
+      
+      .signin-link a:hover {
+        text-decoration: underline;
+      }
+      
+      .auth-messages {
+        margin-bottom: 1rem;
+        padding: 0;
+        list-style: none;
+      }
+      
+      .auth-messages li {
+        background: #fee;
+        color: #c33;
+        padding: 0.8rem 1rem;
+        border-radius: 8px;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+        border-left: 4px solid #f44;
+      }
+      
+      /* Responsive styles for mobile */
+      @media (max-width: 768px) {
+        .auth-container {
+          flex-direction: column;
+          max-width: 400px;
+        }
+        
+        .auth-left {
+          padding: 2rem;
+          min-height: 150px;
+        }
+        
+        .auth-left h1 {
+          font-size: 1.8rem;
+        }
+        
+        .auth-left p {
+          font-size: 0.95rem;
+        }
+        
+        .feature-list {
+          display: none;
+        }
+        
+        .auth-right {
+          padding: 2rem;
+        }
+        
+        .back-home {
+          top: 1rem;
+          right: 1rem;
+        }
+      }
+      
+      @media (max-width: 480px) {
+        .auth-container {
+          max-width: 100%;
+          margin: 0;
+          border-radius: 0;
+        }
+        
+        .auth-left {
+          display: none;
+        }
+        
+        .auth-right {
+          padding: 1.5rem;
+        }
+        
+        .back-home {
+          font-size: 0.8rem;
+          padding: 0.4rem 0.8rem;
+        }
+        
+        .auth-card h2 {
+          font-size: 1.5rem;
+        }
+        
+        .auth-subtitle {
+          font-size: 0.85rem;
+          margin-bottom: 1.5rem;
+        }
+        
+        .auth-form-group {
+          margin-bottom: 1rem;
+        }
+        
+        .auth-form-group label {
+          font-size: 0.85rem;
+        }
+        
+        .auth-input {
+          padding: 0.7rem 0.9rem 0.7rem 2.5rem;
+          font-size: 0.95rem;
+        }
+        
+        .input-icon {
+          width: 18px;
+          height: 18px;
+          left: 0.8rem;
+        }
+        
+        .password-strength {
+          margin-top: 0.3rem;
+        }
+        
+        .terms-checkbox {
+          font-size: 0.85rem;
+          margin-bottom: 1rem;
+        }
+        
+        .terms-checkbox input[type='checkbox'] {
+          width: 16px;
+          height: 16px;
+        }
+        
+        .auth-btn {
+          padding: 0.8rem;
+          font-size: 1rem;
+        }
+        
+        .divider {
+          margin: 1.5rem 0;
+        }
+        
+        .signin-link {
+          font-size: 0.9rem;
+          margin-top: 1.5rem;
+        }
+      }
+      
+      @media (max-width: 360px) {
+        body {
+          padding: 0;
+        }
+        
+        .auth-right {
+          padding: 1rem;
+        }
+        
+        .back-home {
+          top: 0.5rem;
+          right: 0.5rem;
+          font-size: 0.75rem;
+          padding: 0.3rem 0.6rem;
+        }
+        
+        .auth-card h2 {
+          font-size: 1.3rem;
+        }
+        
+        .auth-subtitle {
+          font-size: 0.8rem;
+        }
+        
+        .auth-input {
+          padding: 0.6rem 0.8rem 0.6rem 2.2rem;
+          font-size: 0.9rem;
+        }
+        
+        .auth-btn {
+          padding: 0.7rem;
+          font-size: 0.95rem;
+          letter-spacing: 0.5px;
+        }
+        
+        .terms-checkbox {
+          font-size: 0.8rem;
+        }
+        
+        .signin-link {
+          font-size: 0.85rem;
+        }
+      }
     </style>
 </head>
 <body>
-    <div class="auth-card">
-        <h2>Register</h2>
-        <form method="POST">
-            {{ form.hidden_tag() }}
-            <div class="auth-form-group">
-                {{ form.username.label }}
-                {{ form.username(class_="auth-input") }}
-            </div>
-            <div class="auth-form-group">
-                {{ form.password.label }}
-                {{ form.password(class_="auth-input") }}
-            </div>
-            <div class="auth-form-group">
-                {{ form.confirm.label }}
-                {{ form.confirm(class_="auth-input") }}
-            </div>
-            <div>
-                {{ form.submit(class_="auth-btn") }}
-            </div>
-        </form>
-        {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}
-            <ul class="auth-messages">
-            {% for category, message in messages %}
-              <li class="{{ category }}">{{ message }}</li>
-            {% endfor %}
+    <div class="auth-container">
+        <!-- Left Side - Welcome Section -->
+        <div class="auth-left">
+            <h1>Join Story Quiz!</h1>
+            <p>Create your account and start your learning adventure</p>
+            <ul class="feature-list">
+                <li>AI-powered story summaries</li>
+                <li>Interactive quizzes</li>
+                <li>Track your progress</li>
+                <li>Compete with friends</li>
             </ul>
-          {% endif %}
-        {% endwith %}
+        </div>
+        
+        <!-- Right Side - Register Form -->
+        <div class="auth-right">
+            <a href="{{ url_for('hello_world') }}" class="back-home">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+                Back to Home
+            </a>
+            
+            <div class="auth-card">
+                <h2>Create Account</h2>
+                <p class="auth-subtitle">Fill in your details to get started</p>
+                
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                  {% if messages %}
+                    <ul class="auth-messages">
+                    {% for category, message in messages %}
+                      <li class="{{ category }}">{{ message }}</li>
+                    {% endfor %}
+                    </ul>
+                  {% endif %}
+                {% endwith %}
+                
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="auth-form-group">
+                        <label for="username">Username</label>
+                        <div class="input-wrapper">
+                            <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                <circle cx="12" cy="7" r="4"/>
+                            </svg>
+                            {{ form.username(class_="auth-input", placeholder="Choose a username") }}
+                        </div>
+                    </div>
+                    
+                    <div class="auth-form-group">
+                        <label for="password">Password</label>
+                        <div class="input-wrapper">
+                            <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                            </svg>
+                            {{ form.password(class_="auth-input", placeholder="Create a strong password", id="password") }}
+                        </div>
+                        <div class="password-strength">
+                            <div class="password-strength-bar" id="strengthBar"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="auth-form-group">
+                        <label for="confirm">Confirm Password</label>
+                        <div class="input-wrapper">
+                            <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 11l3 3L22 4"/>
+                                <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+                            </svg>
+                            {{ form.confirm(class_="auth-input", placeholder="Confirm your password") }}
+                        </div>
+                    </div>
+                    
+                    <div class="terms-checkbox">
+                        <input type="checkbox" id="terms" required>
+                        <label for="terms">
+                            I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+                        </label>
+                    </div>
+                    
+                    {{ form.submit(class_="auth-btn", value="Create Account") }}
+                </form>
+                
+                <div class="divider">
+                    <span>OR</span>
+                </div>
+                
+                <div class="signin-link">
+                    Already have an account? <a href="{{ url_for('login') }}">Sign in</a>
+                </div>
+            </div>
+        </div>
     </div>
+    
+    <script>
+        // Password strength indicator
+        const passwordInput = document.getElementById('password');
+        const strengthBar = document.getElementById('strengthBar');
+        
+        if (passwordInput && strengthBar) {
+            passwordInput.addEventListener('input', function() {
+                const password = this.value;
+                let strength = 0;
+                
+                if (password.length >= 8) strength++;
+                if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength++;
+                if (password.match(/[0-9]/)) strength++;
+                if (password.match(/[^a-zA-Z0-9]/)) strength++;
+                
+                strengthBar.className = 'password-strength-bar';
+                
+                if (password.length === 0) {
+                    strengthBar.style.width = '0%';
+                } else if (strength <= 1) {
+                    strengthBar.classList.add('password-strength-weak');
+                    strengthBar.style.width = '33%';
+                } else if (strength === 2 || strength === 3) {
+                    strengthBar.classList.add('password-strength-medium');
+                    strengthBar.style.width = '66%';
+                } else {
+                    strengthBar.classList.add('password-strength-strong');
+                    strengthBar.style.width = '100%';
+                }
+            });
+        }
+    </script>
 </body>
 </html>

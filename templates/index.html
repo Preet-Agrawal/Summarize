@@ -18,7 +18,12 @@
       <img src="{{ url_for('static', filename='images/logo.jpg') }}" alt="Logo" class="logo" width="40" height="40">
       <h2 class="site-title">Story Quiz</h2>
     </div>
-    <nav class="header-right">
+    <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    <nav class="header-right" id="navMenu">
       <a href="{{ url_for('hello_world') }}" class="nav-link">Home</a>
       <a href="{{ url_for('contact') }}" class="nav-link">Contact</a>
       <div class="dropdown">

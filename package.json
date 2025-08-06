@@ -1,13 +1,35 @@
 {
-  "name": "summarize-app",
+  "name": "story-quiz",
   "version": "1.0.0",
-  "description": "Flask application with npm start support",
+  "description": "AI-Powered Story Summarizer & Quiz Generator",
+  "main": "start.js",
   "scripts": {
-    "start": "PORT=3000 python app.py",
-    "dev": "PORT=3000 python app.py",
-    "install-deps": "pip install -r requirements.txt"
+    "start": "node start.js",
+    "start:production": "python app.py",
+    "dev": "FLASK_ENV=development node start.js",
+    "build": "npm run build:render",
+    "build:render": "pip install --upgrade pip && pip install -r requirements.txt && pip install gunicorn && echo '✅ Build complete for Render deployment'",
+    "build:check": "python -c \"import flask; import pymongo; print('✅ All dependencies installed successfully')\"",
+    "postbuild": "npm run build:check",
+    "start:python": "python app.py",
+    "start:windows": "set FLASK_ENV=production && python app.py",
+    "start:mac": "FLASK_ENV=production python3 app.py",
+    "install": "pip install -r requirements.txt",
+    "install:python": "pip install -r requirements.txt",
+    "setup": "npm run install:python && node -e \"require('fs').existsSync('.env') || require('fs').copyFileSync('.env.example', '.env')\"",
+    "setup:full": "npm install && npm run setup",
+    "mongo": "mongod",
+    "mongo:start": "mongod --dbpath ./data/db",
+    "test": "python -m pytest",
+    "check": "python -c \"import flask; import pymongo; print('✅ Dependencies OK')\"",
+    "clean": "find . -type d -name __pycache__ -exec rm -r {} + 2>/dev/null || true",
+    "deploy:render": "npm run build && npm run start:production"
   },
-  "keywords": ["flask", "python", "web"],
-  "author": "",
-  "license": "ISC"
+  "keywords": ["flask", "python", "mongodb", "ai", "quiz", "education"],
+  "author": "IIIT Surat Students",
+  "license": "MIT",
+  "engines": {
+    "node": ">=14.0.0",
+    "python": ">=3.7.0"
+  }
 }
