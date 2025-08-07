@@ -16,6 +16,10 @@ from flask_mail import Mail, Message
 load_dotenv()
 app = Flask(__name__)
 CORS(app)
+
+# Ensure SECRET_KEY is set in production
+if os.environ.get('FLASK_ENV') == 'production' and not os.environ.get('SECRET_KEY'):
+    raise ValueError("SECRET_KEY must be set in production environment")
 app.secret_key = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
 bcrypt = Bcrypt(app)
 
@@ -29,16 +33,26 @@ app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER')
 
 mail = Mail(app)
 
-# Demo user store (replace with DB in production)
-# Remove the users = {...} dictionary
+# MongoDB Configuration
 app.config["MONGO_URI"] = os.environ.get("MONGO_URI")
-mongo = PyMongo(app)
+if not app.config["MONGO_URI"]:
+    raise ValueError("MONGO_URI must be set in environment variables")
 
+try:
+    mongo = PyMongo(app)
+    # Test the connection
+    mongo.db.command('ping')
+    print("MongoDB connection successful")
+except Exception as e:
+    print(f"MongoDB connection failed: {e}")
+    if os.environ.get('FLASK_ENV') == 'production':
+        raise
 
-# To register a user (example)
-if not mongo.db.users.find_one({"username": "testuser"}):
-    hashed_pw = bcrypt.generate_password_hash("testpass").decode('utf-8')
-    mongo.db.users.insert_one({"username": "testuser", "password": hashed_pw})
+# Only create test user in development
+if os.environ.get('FLASK_ENV') != 'production':
+    if not mongo.db.users.find_one({"username": "testuser"}):
+        hashed_pw = bcrypt.generate_password_hash("testpass").decode('utf-8')
+        mongo.db.users.insert_one({"username": "testuser", "password": hashed_pw})
 
 def login_required(f):
     @wraps(f)
@@ -419,7 +433,8 @@ if __name__ == "__main__":
     # Use PORT from environment (Render provides this), fallback to 5000
     port = int(os.environ.get("PORT", 5000))
     host = "0.0.0.0"  # Listen on all interfaces
-    debug = os.environ.get("FLASK_ENV", "development") == "development"
+    # Explicitly disable debug in production
+    debug = os.environ.get("FLASK_ENV", "development") == "development" and os.environ.get("FLASK_ENV") != "production"
     
     print(f"Starting Story Quiz application...")
     print(f"Running on port {port}")

@@ -30,7 +30,7 @@ def check_python_package(package_name):
 
 def check_env_example():
     """Check if .env.example has all required variables documented"""
-    required_vars = ['MONGO_URI', 'GROQ_API_KEY', 'SECRET_KEY']
+    required_vars = ['MONGO_URI', 'HUGGINGFACE_API_KEY', 'SECRET_KEY']
     if os.path.exists('.env.example'):
         with open('.env.example', 'r') as f:
             content = f.read()
@@ -80,7 +80,7 @@ def main():
         'flask_pymongo',
         'flask_wtf',
         'flask_mail',
-        'groq',
+        'requests',
         'dotenv'
     ]
     
@@ -110,7 +110,7 @@ def main():
         print("✅ All checks passed! Ready for Render deployment.")
         print("\nNext steps:")
         print("1. Set up MongoDB Atlas and get connection string")
-        print("2. Get Groq API key from https://console.groq.com")
+        print("2. Get Hugging Face API key from https://huggingface.co/settings/tokens")
         print("3. Push to GitHub: git push origin main")
         print("4. Deploy on Render: https://render.com")
         return 0
