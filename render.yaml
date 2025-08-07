@@ -4,7 +4,7 @@ services:
     runtime: python
     plan: free
     buildCommand: "pip install -r requirements.txt"
-    startCommand: "gunicorn app:app --bind 0.0.0.0:$PORT"
+    startCommand: "gunicorn --config gunicorn_config.py app:app"
     envVars:
       - key: PYTHON_VERSION
         value: 3.11
@@ -16,7 +16,5 @@ services:
         generateValue: true
       - key: FLASK_ENV
         value: production
-      - key: HOST
-        value: 0.0.0.0
     autoDeploy: true
     healthCheckPath: /
