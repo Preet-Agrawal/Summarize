@@ -417,7 +417,7 @@ def contact_submit():
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))  # Use environment port or default to 5000
-    host = os.environ.get("HOST", "0.0.0.0")  # Default to localhost for local development
+    host = os.environ.get("HOST", "127.0.0.1")  # Default to localhost for local development
     debug = os.environ.get("FLASK_ENV", "development") == "development"
     
     print(f"Starting Story Quiz application...")
