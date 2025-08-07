@@ -18,10 +18,10 @@ if (!env.FLASK_ENV) {
     env.FLASK_ENV = 'development';
 }
 if (!env.HOST) {
-    env.HOST = '127.0.0.1';
+    env.HOST = process.env.HOST || '0.0.0.0';
 }
 if (!env.PORT) {
-    env.PORT = '5000';
+    env.PORT = process.env.PORT || '5000';
 }
 
 console.log('🚀 Starting Story Quiz Application...');
