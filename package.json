@@ -25,11 +25,21 @@
     "clean": "find . -type d -name __pycache__ -exec rm -r {} + 2>/dev/null || true",
     "deploy:render": "npm run build && npm run start:production"
   },
-  "keywords": ["flask", "python", "mongodb", "ai", "quiz", "education"],
+  "keywords": [
+    "flask",
+    "python",
+    "mongodb",
+    "ai",
+    "quiz",
+    "education"
+  ],
   "author": "IIIT Surat Students",
   "license": "MIT",
   "engines": {
     "node": ">=14.0.0",
     "python": ">=3.7.0"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.1"
   }
 }

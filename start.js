@@ -7,6 +7,7 @@
 const { spawn } = require('child_process');
 const os = require('os');
 const path = require('path');
+require('dotenv').config();
 
 // Determine Python command based on OS
 const isWindows = os.platform() === 'win32';
