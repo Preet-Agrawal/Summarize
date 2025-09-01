@@ -53,22 +53,37 @@ app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER')
 mail = Mail(app)
 
 # MongoDB Configuration
-app.config["MONGO_URI"] = os.environ.get("MONGO_URI")
-if not app.config["MONGO_URI"]:
-    raise ValueError("MONGO_URI must be set in environment variables")
+mongo_uri = os.environ.get("MONGO_URI")
+mongo = None
+mongo_connected = False
+
+if not mongo_uri:
+    raise ValueError("MONGO_URI must be set in environment variables. Please check your .env file.")
 
 try:
-    mongo = PyMongo(app)
-    # Test the connection
-    mongo.db.command('ping')
-    print("MongoDB connection successful")
+    # Validate URI format before attempting connection
+    if mongo_uri.startswith(('mongodb://', 'mongodb+srv://')):
+        app.config["MONGO_URI"] = mongo_uri
+        mongo = PyMongo(app)
+        
+        # Ensure mongo object is properly initialized
+        if mongo is None or not hasattr(mongo, 'db'):
+            raise Exception("PyMongo initialization failed")
+        
+        # Test the connection
+        mongo.db.command('ping')
+        mongo_connected = True
+        print("✅ MongoDB Atlas connection successful!")
+    else:
+        raise ValueError("Invalid MongoDB URI format. Must start with 'mongodb://' or 'mongodb+srv://'")
 except Exception as e:
-    print(f"MongoDB connection failed: {e}")
-    if os.environ.get('FLASK_ENV') == 'production':
-        raise
+    print(f"❌ MongoDB connection failed: {e}")
+    print("Please check your MONGO_URI in the .env file")
+    print(f"Current MONGO_URI value: {mongo_uri[:20]}..." if mongo_uri else "MONGO_URI is None/empty")
+    raise
 
-# Only create test user in development
-if os.environ.get('FLASK_ENV') != 'production':
+# Only create test user in development and if MongoDB is connected
+if os.environ.get('FLASK_ENV') != 'production' and mongo_connected:
     if not mongo.db.users.find_one({"username": "testuser"}):
         hashed_pw = bcrypt.generate_password_hash("testpass").decode('utf-8')
         mongo.db.users.insert_one({"username": "testuser", "password": hashed_pw})
@@ -81,6 +96,11 @@ def login_required(f):
             return redirect(url_for('login'))
         return f(*args, **kwargs)
     return decorated_function
+
+# Add favicon route to prevent 404 errors
+@app.route('/favicon.ico')
+def favicon():
+    return '', 204  # No Content response
 
 # Hugging Face API configuration for better models
 HUGGINGFACE_API_URL = "https://api-inference.huggingface.co/models/facebook/bart-large-cnn"  # Better for summarization
@@ -558,6 +578,9 @@ def format_quiz_questions(questions):
 @app.route("/users")
 @login_required
 def list_users():
+    if not mongo_connected:
+        flash('Database unavailable. Please try again later.', 'error')
+        return redirect(url_for('hello_world'))
     users = list(mongo.db.users.find({}, {"_id": 0, "username": 1}))
     return render_template('users.html', users=users)
 
@@ -573,7 +596,7 @@ def test_auth():
 
 @app.route("/")
 def hello_world():
-    return render_template('index.html')
+    return render_template('index.html', mongo_connected=mongo_connected)
 
 @app.route("/auth")
 def auth_choice():
@@ -583,25 +606,37 @@ def auth_choice():
 @app.route("/register", methods=["GET", "POST"])
 def register():
     form = RegistrationForm()
+    
     if form.validate_on_submit():
         username = form.username.data
         password = form.password.data
+        
+        # Check if username already exists
         if mongo.db.users.find_one({"username": username}):
             flash('Username already exists. Please choose another.', 'danger')
         else:
+            # Create new user
             hashed_pw = bcrypt.generate_password_hash(password).decode('utf-8')
-            mongo.db.users.insert_one({"username": username, "password": hashed_pw})
+            mongo.db.users.insert_one({
+                "username": username, 
+                "password": hashed_pw,
+                "created_at": get_ist_time()
+            })
             flash('Registration successful! Please log in.', 'success')
             return redirect(url_for('login'))
+    
     return render_template('register.html', form=form)
 
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
     form = LoginForm()
+    
     if form.validate_on_submit():
         username = form.username.data
         password = form.password.data
+        
+        # Find user in MongoDB
         user = mongo.db.users.find_one({"username": username})
         if user and bcrypt.check_password_hash(user["password"], password):
             session['username'] = username
@@ -609,6 +644,7 @@ def login():
             return redirect(url_for('hello_world'))
         else:
             flash('Invalid username or password', 'danger')
+    
     return render_template('login.html', form=form)
 @app.route('/logout')
 def logout():
@@ -645,15 +681,17 @@ def generate():
         # Pass the user's story text directly to the AI function
         result = generate_free_response(user_text)
         
-        # Save quiz generation to MongoDB for the logged-in user
+        # Save quiz generation to MongoDB
         quiz_result = mongo.db.quiz_results.insert_one({
             "username": session['username'],
-            "story": user_text,     # Save the original story
-            "summary": result,      # This is the generated summary+quiz
-            "score": None,         # You can update this later if you add scoring
+            "story": user_text,
+            "summary": result,
+            "score": None,
             "date": get_ist_time()
         })
-        return jsonify({"result": result, "quiz_id": str(quiz_result.inserted_id)})
+        quiz_id = str(quiz_result.inserted_id)
+        
+        return jsonify({"result": result, "quiz_id": quiz_id})
     except Exception as e:
         print(f"Error in generate route: {str(e)}")
         return jsonify({"error": str(e)}), 500
@@ -693,15 +731,18 @@ def contact_submit():
     subject = request.form.get('subject')
     message = request.form.get('message')
     
-    # Store in MongoDB if you want to save contact messages
+    # Store in MongoDB
     if name and email and message:
-        mongo.db.contact_messages.insert_one({
-            "name": name,
-            "email": email,
-            "subject": subject,
-            "message": message,
-            "date": get_ist_time()
-        })
+        try:
+            mongo.db.contact_messages.insert_one({
+                "name": name,
+                "email": email,
+                "subject": subject,
+                "message": message,
+                "date": get_ist_time()
+            })
+        except Exception as e:
+            print(f"Failed to save contact message to database: {e}")
         
         # Send email notification if email is configured
         if app.config['MAIL_USERNAME'] and app.config['MAIL_PASSWORD']:

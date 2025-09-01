@@ -12,8 +12,8 @@ max_requests = 1000
 max_requests_jitter = 50
 
 # Timeout configuration
-timeout = 120
-graceful_timeout = 30
+timeout = 300
+graceful_timeout = 60
 keepalive = 2
 
 # Logging
