@@ -60,26 +60,43 @@ mongo_connected = False
 if not mongo_uri:
     raise ValueError("MONGO_URI must be set in environment variables. Please check your .env file.")
 
+print(f"Attempting to connect to MongoDB...")
+print(f"MONGO_URI starts with: {mongo_uri[:30]}..." if len(mongo_uri) > 30 else mongo_uri)
+
 try:
     # Validate URI format before attempting connection
-    if mongo_uri.startswith(('mongodb://', 'mongodb+srv://')):
-        app.config["MONGO_URI"] = mongo_uri
-        mongo = PyMongo(app)
-        
-        # Ensure mongo object is properly initialized
-        if mongo is None or not hasattr(mongo, 'db'):
-            raise Exception("PyMongo initialization failed")
-        
-        # Test the connection
-        mongo.db.command('ping')
-        mongo_connected = True
-        print("✅ MongoDB Atlas connection successful!")
-    else:
+    if not mongo_uri.startswith(('mongodb://', 'mongodb+srv://')):
         raise ValueError("Invalid MongoDB URI format. Must start with 'mongodb://' or 'mongodb+srv://'")
+    
+    # Set the URI in Flask config
+    app.config["MONGO_URI"] = mongo_uri
+    
+    # Initialize PyMongo
+    mongo = PyMongo()
+    mongo.init_app(app)
+    
+    # Ensure mongo object is properly initialized
+    if mongo is None:
+        raise Exception("PyMongo initialization returned None")
+    
+    if not hasattr(mongo, 'db'):
+        raise Exception("PyMongo object missing 'db' attribute")
+    
+    # Test the connection
+    result = mongo.db.command('ping')
+    if result.get('ok') != 1:
+        raise Exception("MongoDB ping failed")
+    
+    mongo_connected = True
+    print("✅ MongoDB Atlas connection successful!")
+    
 except Exception as e:
     print(f"❌ MongoDB connection failed: {e}")
-    print("Please check your MONGO_URI in the .env file")
-    print(f"Current MONGO_URI value: {mongo_uri[:20]}..." if mongo_uri else "MONGO_URI is None/empty")
+    print("Please verify:")
+    print("1. Your .env file exists and contains MONGO_URI")
+    print("2. MongoDB Atlas cluster is running")
+    print("3. Network access is configured (0.0.0.0/0)")
+    print("4. Database user has proper permissions")
     raise
 
 # Only create test user in development and if MongoDB is connected
