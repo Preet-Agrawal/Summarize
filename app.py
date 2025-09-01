@@ -819,5 +819,6 @@ if __name__ == "__main__":
     print(f"Starting Story Quiz application...")
     print(f"Running on port {port}")
     print(f"Debug mode: {debug}")
+    print(f"Environment: {os.environ.get('FLASK_ENV', 'development')}")
     
     app.run(debug=debug, host=host, port=port)
