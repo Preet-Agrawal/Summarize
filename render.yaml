@@ -16,6 +16,8 @@ services:
         generateValue: true
       - key: FLASK_ENV
         value: production
+      - key: PORT
+        value: 8000
       - key: MAIL_SERVER
         value: smtp.gmail.com
       - key: MAIL_PORT
