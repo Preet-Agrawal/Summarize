@@ -60,8 +60,6 @@ mongo_connected = False
 if not mongo_uri:
     raise ValueError("MONGO_URI must be set in environment variables. Please check your .env file.")
 
-print(f"Attempting to connect to MongoDB...")
-print(f"MONGO_URI starts with: {mongo_uri[:30]}..." if len(mongo_uri) > 30 else mongo_uri)
 
 try:
     # Validate URI format before attempting connection
@@ -88,7 +86,7 @@ try:
         raise Exception("MongoDB ping failed")
     
     mongo_connected = True
-    print("✅ MongoDB Atlas connection successful!")
+    print("Database connected")
     
 except Exception as e:
     print(f"❌ MongoDB connection failed: {e}")
