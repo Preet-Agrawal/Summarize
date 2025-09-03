@@ -808,8 +808,8 @@ def contact_submit():
     return redirect(url_for('contact'))
 
 if __name__ == "__main__":
-    # Use PORT from environment (Render provides this), fallback to 5000
-    port = int(os.environ.get("PORT", 5000))
+    # Use PORT from environment (Render provides this), fallback to 8000
+    port = int(os.environ.get("PORT", 8000))
     host = "0.0.0.0"  # Listen on all interfaces
     # Explicitly disable debug in production
     debug = os.environ.get("FLASK_ENV", "development") == "development" and os.environ.get("FLASK_ENV") != "production"
