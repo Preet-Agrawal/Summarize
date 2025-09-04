@@ -1,10 +1,14 @@
 import os
 
+# Debug: Check what PORT Render is providing
+print(">>> Gunicorn binding to PORT:", os.environ.get("PORT"))
+print(">>> Full bind address will be:", f"0.0.0.0:{os.environ.get('PORT', '8000')}")
+
 # Bind to the port that Render provides via the PORT environment variable
 bind = f"0.0.0.0:{os.environ.get('PORT', '8000')}"
 
 # Worker configuration  
-workers = 1
+workers = 4
 threads = 4
 worker_class = 'gthread'
 worker_connections = 1000

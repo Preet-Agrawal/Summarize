@@ -62,6 +62,8 @@ if not mongo_uri:
 
 
 try:
+    print(">>> Starting MongoDB connection...")
+    
     # Validate URI format before attempting connection
     if not mongo_uri.startswith(('mongodb://', 'mongodb+srv://')):
         raise ValueError("Invalid MongoDB URI format. Must start with 'mongodb://' or 'mongodb+srv://'")
@@ -80,13 +82,14 @@ try:
     if not hasattr(mongo, 'db'):
         raise Exception("PyMongo object missing 'db' attribute")
     
-    # Test the connection
+    # Test the connection with timeout
+    print(">>> Testing MongoDB connection...")
     result = mongo.db.command('ping')
     if result.get('ok') != 1:
         raise Exception("MongoDB ping failed")
     
     mongo_connected = True
-    print("Database connected")
+    print(">>> Database connected successfully")
     
 except Exception as e:
     print(f"❌ MongoDB connection failed: {e}")
