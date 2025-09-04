@@ -3,10 +3,10 @@ import os
 # Bind to the port that Render provides via the PORT environment variable
 bind = f"0.0.0.0:{os.environ.get('PORT', 8000)}"
 
-# Worker configuration
-workers = 2
-threads = 2
-worker_class = 'sync'
+# Worker configuration  
+workers = 1
+threads = 4
+worker_class = 'gthread'
 worker_connections = 1000
 max_requests = 1000
 max_requests_jitter = 50
