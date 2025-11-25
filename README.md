@@ -3,7 +3,6 @@
 An interactive web application that uses AI to summarize stories and automatically generate quizzes to test comprehension. Built with Flask, MongoDB, and AI APIs, this project helps students improve their reading comprehension through engaging, interactive quizzes.
 
 ## Features
-
 - 📚 **AI-Powered Summarization**: Automatically summarize long stories and texts
 - 🎯 **Instant Quiz Generation**: Generate comprehension quizzes based on the story content
 - 👤 **User Authentication**: Secure login and registration system
