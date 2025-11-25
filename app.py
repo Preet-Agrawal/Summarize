@@ -17,7 +17,6 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app)
 
-# IST timezone helper
 IST = timezone(timedelta(hours=5, minutes=30))
 
 def get_ist_time():
